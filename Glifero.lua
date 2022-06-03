@@ -1,6 +1,6 @@
 -- Ariel Camilo // 3 de Mayo 2022
 
-local NpcId,q = 0000 --> Modifica este número por el ID del NPC que estará a cargo de este Script.
+local NpcId = 0000 --> Modifica este número por el ID del NPC que estará a cargo de este Script.
 
 local gue,pal,caz,pic,sac,q = '|cff874f00','|cffff75f8','|cff4f943a','|cffdade00','|cffffffff','Escribe la cantidad (Max 20)'
 local cab,cha,mag,bru,dru = '|cffff0000','|cff001eff','|cff1feaed','|cff740091','|cffff6f00'
