@@ -425,7 +425,7 @@ end
 
 local function MenuClick(E,P,U,S,id) P:GossipClearMenu() 
 
-	if S==0 and id==0 then Hello(E,P,U) end
+	if S==0 and id==0 then Saludo(E,P,U) end
 
 	if S>=1 then for i=1,#menu[S] do local a,b,c,d = table.unpack( menu[S][i] ) P:GossipMenuAddItem(a,b,c,d) end 
 		P:GossipSendMenu(1,U)
