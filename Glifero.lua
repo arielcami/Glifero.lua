@@ -1,6 +1,8 @@
 -- Ariel Camilo // 3 de Mayo 2022
 
-local NpcId = 0000 --> Modifica este número por el ID del NPC que estará a cargo de este Script.
+local NpcId = 0000 		--> Modifica este número por el ID del NPC que estará a cargo de este Script.
+local Precio = 1  		--> SOLO 0 ó 1, si colocas otro valor, no funcionará. Coloca 1 si quieres que los glifos cuesten dinero.
+local oro = 20 			--> El precio en ORO que costará cada glifo.	
 
 local gue,pal,caz,pic,sac,q = '|cff874f00','|cffff75f8','|cff4f943a','|cffdade00','|cffffffff','Escribe la cantidad (Max 20)'
 local cab,cha,mag,bru,dru = '|cffff0000','|cff001eff','|cff1feaed','|cff740091','|cffff6f00'
@@ -427,12 +429,22 @@ local function MenuClick(E,P,U,S,id) P:GossipClearMenu()
 
 	if S==0 and id==0 then Saludo(E,P,U) end
 
-	if S>=1 then for i=1,#menu[S] do local a,b,c,d = table.unpack( menu[S][i] ) P:GossipMenuAddItem(a,b,c,d) end 
+	if S>=1 then 
+		for i=1,#menu[S] do local a,b,c,d = table.unpack( menu[S][i] ) P:GossipMenuAddItem(a,b,c,d) end 
 		P:GossipSendMenu(1,U)
 	end
 
-	if S>=1 and id>40000 then P:AddItem(id,1) end
-
+	if S>=1 and id>40000 then
+		if Precio == 1 then
+			if P:GetCoinage() >= (oro*10000) then
+				P:ModifyMoney(-1*(oro*10000))
+				P:SendBroadcastMessage("Has pagado "..oro.." de oro.")
+			else
+				U:SendUnitSay('No tienes suficiente dinero.',0) P:GossipComplete() return
+			end
+		end
+		P:AddItem(id,1) if Precio ==1 then P:GossipComplete() end		
+	end
 end
 RegisterCreatureGossipEvent(NpcId, 1, Saludo)
 RegisterCreatureGossipEvent(NpcId, 2, MenuClick)
