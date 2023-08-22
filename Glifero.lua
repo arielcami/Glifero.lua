@@ -1,450 +1,123 @@
--- Ariel Camilo // 3 de Mayo 2022
+-- Ariel Camilo - Agosto 2023
+local NPC           =   00000
+local SCRIPT_ON     =   true
 
-local NpcId = 0000 		--> Modifica este número por el ID del NPC que estará a cargo de este Script.
-local Precio = 1  		--> SOLO 0 ó 1, si colocas otro valor, no funcionará. Coloca 1 si quieres que los glifos cuesten dinero.
-local oro = 20 			--> El precio en ORO que costará cada glifo.	
+local i = { --> Los 10 primeros son el ícono y los nombres de clase para los GossipMenuAddItem.
+{"|TInterface\\Icons\\inv_sword_27:33:33:-23|t",                "Guerrero"},
+{"|TInterface\\Icons\\inv_hammer_01:33:33:-23|t",               "Paladín"},
+{"|TInterface\\Icons\\inv_weapon_bow_07:33:33:-23|t",           "Cazador"},
+{"|TInterface\\Icons\\inv_throwingknife_04:33:33:-23|t",        "Pícaro"},
+{"|TInterface\\Icons\\inv_staff_30:33:33:-23|t",                "Sacerdote"}, 
+{"|TInterface\\Icons\\spell_deathknight_classicon:33:33:-23|t", "Caballero de la Muerte"},
+{"|TInterface\\Icons\\spell_nature_bloodlust:33:33:-23|t",      "Chamán"},
+{"|TInterface\\Icons\\inv_staff_13:33:33:-23|t",                "Mago"},
+{"|TInterface\\Icons\\spell_nature_faeriefire:33:33:-23|t",     "Brujo"},
+{"|TInterface\\Icons\\inv_misc_monsterclaw_04:33:33:-23|t",     "Druida"},
+--> De acá para abajo son solo íconos de los glifos sublimes y menores de cada clase.
+{"inv_glyph_majorwarrior", "inv_glyph_minorwarrior"},           -- 11
+{"inv_glyph_majorpaladin", "inv_glyph_minorpaladin"},           -- 12
+{"inv_glyph_majorhunter", "inv_glyph_minorhunter"},             -- 13
+{"inv_glyph_majorrogue", "inv_glyph_minorrogue"},               -- 14
+{"inv_glyph_majorpriest", "inv_glyph_minorpriest"},             -- 15
+{"inv_glyph_majordeathknight", "inv_glyph_minordeathknight"},   -- 16
+{"inv_glyph_majorshaman", "inv_glyph_minorshaman"},             -- 17
+{"inv_glyph_majormage", "inv_glyph_minormage"},                 -- 18
+{"inv_glyph_majorwarlock", "inv_glyph_minorwarlock"},           -- 19
+{"inv_glyph_majordruid", "inv_glyph_minordruid"}}               -- 20
 
-local gue,pal,caz,pic,sac,q = '|cff874f00','|cffff75f8','|cff4f943a','|cffdade00','|cffffffff','Escribe la cantidad (Max 20)'
-local cab,cha,mag,bru,dru = '|cffff0000','|cff001eff','|cff1feaed','|cff740091','|cffff6f00'
+local major = {--> ID de los glifos sublimes de todas las clases.
+{43419,43415,45790,45792,45793,45794,45795,45797,43412,43421,43425,43432,43428,43416,43414,43426,43420,43431,43424,43422,43427,43429,43417,43430,43413,43423,43418},
+{41101,41107,45741,41104,41099,41098,45745,45743,41108,41103,41105,41095,45742,41097,41106,45746,41092,41100,45747,43867,41094,41110,43868,43869,41109,45744,41096,41102},
+{42897,42898,42899,42900,42901,42902,45625,42903,42904,45731,45733,42905,42906,42907,42908,42909,45732,42910,42911,45735,45734,42912,42913,42914,42915,42916,42917},
+{42954,42955,42956,42957,45769,42958,42959,42960,42961,42962,45766,42963,42964,42965,42966,42967,45761,45762,45768,42968,42969,42970,45764,42972,42973,42974,45767,42971},
+{42396,42397,45753,42398,42399,42400,45755,42401,45758,42402,42403,42404,42405,42406,45757,45760,45756,42408,42409,42410,42411,42412,42407,42414,42415,42416,42417},
+{43533,43826,43536,43537,45799,43538,45804,43542,43541,43827,45805,43543,43534,45806,45800,43545,43546,43547,43548,43550,43825,43551,43552,43549,43553,45803,43554},
+{41517,41518,45775,41526,41527,41552,45771,41529,41530,41531,41532,41547,41533,41534,45777,41524,41540,41535,41536,41537,41538,45772,45778,41539,45770,45776,41541,41542},
+{45738,44955,42734,42735,42736,42737,45736,50045,42738,42740,42739,42741,42742,44684,42743,45740,42744,42745,42746,42747,42748,45737,42749,42750,45739,42751,42752,42753,42754},
+{45781,42454,42455,42456,42457,45782,42458,42459,42460,45779,42461,42462,42463,42464,42465,42453,45785,45780,50077,42466,42467,42468,45783,42469,45789,42470,42471,42472,42473},
+{45623,45601,48720,40924,44928,40896,40899,40914,40920,40908,40919,40915,40900,40897,45622,40923,45603,40903,50125,40909,40912,40913,40902,45604,40901,40921,40916,46372,40906,40922,45602}}
 
-local menu = {
-	[0]={
-		{0,gue.."Guerrero",1,0},
-		{0,pal.."Paladín",2,0},
-		{0,caz.."Cazador",3,0},
-		{0,pic.."Pícaro",4,0},
-		{0,sac.."Sacerdote",5,0},
-		{0,cab.."Caballero de la muerte",6,0},
-		{0,cha.."Chamán",7,0},
-		{0,mag.."Mago",8,0},
-		{0,bru.."Brujo",9,0},
-		{0,dru.."Druida",10,0}},
-	[1]={
-		{1,gue.."1-|r Insultos barbáricos", 	1, 43420},
-		{1,gue.."2-|r Filotormenta", 			1, 45790},
-		{1,gue.."3-|r Bloqueo", 				1, 43425},
-		{1,gue.."4-|r Sed de sangre", 			1, 43412},
-		{1,gue.."5-|r Rajar", 					1, 43414},
-		{1,gue.."6-|r Devastar", 				1, 43415},
-		{1,gue.."7-|r Regeneración iracunda",	1, 45794},
-		{1,gue.."8-|r Ejecutar", 				1, 43416},
-		{1,gue.."9-|r Seccionar", 				1, 43417},
-		{1,gue.."10-|r Golpe heroico", 			1, 43418},
-		{1,gue.."11-|r Intervenir", 			1, 43419},
-		{1,gue.."12-|r Última carga", 			1, 43426},
-		{1,gue.."13-|r Golpe mortal", 			1, 43421},
-		{1,gue.."14-|r Abrumar", 				1, 43422},
-		{1,gue.."15-|r Carga rápida",			1, 43413},
-		{1,gue.."16-|r Desgarrar", 				1, 43426},
-		{1,gue.."17-|r Poder resonante", 		1, 43430},
-		{1,gue.."18-|r Revancha",				1, 43424},
-		{1,gue.."19-|r Muro de escudo", 		1, 45797},
-		{1,gue.."20-|r Ola de choque", 			1, 45792},
-		{1,gue.."21-|r Reflejo de hechizos", 	1, 45795},
-		{1,gue.."22-|r Hender armadura", 		1, 43427},
-		{1,gue.."23-|r Golpes de barrido", 		1, 43428},
-		{1,gue.."24-|r Provocar", 				1, 43429},
-		{1,gue.."25-|r Ataque de la victoria", 	1, 43431},
-		{1,gue.."26-|r Vigilancia",				1, 45793},
-		{1,gue.."27-|r Torbellino", 			1, 43432},
-		{1, "Glifos menores >",					100, 0},
-		{7, "< Menú principal",				0, 0}},
-	[100]={
-		{1,gue.."1-|r Batalla",				100, 43395},
-		{1,gue.."2-|r Ira rabiosa",			100, 43396},
-		{1,gue.."3-|r Cargar", 				100, 43397},
-		{1,gue.."4-|r Orden", 				100, 49084},
-		{1,gue.."5-|r Victoria duradera", 	100, 43400},
-		{1,gue.."6-|r Falsa arremetida", 	100, 43398},
-		{1,gue.."7-|r Atronar",				100, 43399},
-		{1, "< Glifos sublimes",			1, 0}},
-	[2]={
-		{1,pal.."1-|r Escudo de vengador",		2, 41101},
-		{1,pal.."2-|r Cólera vengativa", 		2, 41107},
-		{1,pal.."3-|r Señal de la luz", 		2, 45741},
-		{1,pal.."4-|r Limpiar", 				2, 41104},
-		{1,pal.."5-|r Consagración", 			2, 41099},
-		{1,pal.."6-|r Golpe de cruzado", 		2, 41098},
-		{1,pal.."7-|r Súplica divina", 			2, 45745},
-		{1,pal.."8-|r Tormenta divina", 		2, 45743},
-		{1,pal.."9-|r Divinidad", 				2, 41108},
-		{1,pal.."10-|r Exorcismo", 				2, 41103},
-		{1,pal.."11-|r Destello de luz", 		2, 41105},
-		{1,pal.."12-|r Martillo de justicia",	2, 41095},
-		{1,pal.."13-|r Martillo del honrado", 	2, 45742},
-		{1,pal.."14-|r Martillo de cólera", 	2, 41097},
-		{1,pal.."15-|r Luz sagrada", 			2, 41106},
-		{1,pal.."16-|r Choque sagrado", 		2, 45746},
-		{1,pal.."17-|r Sentencia", 				2, 41092},
-		{1,pal.."18-|r Defensa recta", 			2, 41100},
-		{1,pal.."19-|r Salvación", 				2, 45747},
-		{1,pal.."20-|r Cólera sagrada", 		2, 43867},
-		{1,pal.."21-|r Sello de orden", 		2, 41094},
-		{1,pal.."22-|r Sello de luz", 			2, 41110},
-		{1,pal.."23-|r Sello de rectitud", 		2, 43868},
-		{1,pal.."24-|r Sello de venganza",		2, 43869},
-		{1,pal.."25-|r Sello de sabiduría", 	2, 41109},
-		{1,pal.."26-|r Escudo de rectitud", 	2, 45744},
-		{1,pal.."27-|r Armonización espiritual",2, 41096},
-		{1,pal.."28-|r Ahuyentar el mal", 		2, 41102},           
-		{1, "Glifos menores >",					200, 0},
-		{7, "< Menú principal",					0, 0}},
-	[200]={
-		{1,pal.."1-|r Bendición de reyes",		200, 43365},
-		{1,pal.."2-|r Bendición de poderío",	200, 43340},
-		{1,pal.."3-|r Bendición de sabiduría", 	200, 43366},
-		{1,pal.."4-|r Imposición de manos", 	200, 43367},  
-		{1,pal.."5-|r Captar No-muertos", 		200, 43368},
-		{1,pal.."6-|r Sabio", 					200, 43369},
-		{1, "< Glifos sublimes",				2, 0}},
-	[3]={
-		{1,caz.."1-|r Disparo de puntería",			3, 42897},
-		{1,caz.."2-|r Disparo arcano", 				3, 42898},
-		{1,caz.."3-|r De la bestia", 				3, 42899},
-		{1,caz.."4-|r Aliviar", 					3, 42900},
-		{1,caz.."5-|r Aspecto de la víbora", 		3, 42901},
-		{1,caz.."6-|r Cólera de las bestias", 		3, 42902},
-		{1,caz.."7-|r Disparo de quimera", 			3, 45625},
-		{1,caz.."8-|r Disuasión", 					3, 42903},
-		{1,caz.."9-|r Separación", 					3, 42904},
-		{1,caz.."10-|r Disparo explosivo", 			3, 45731},
-		{1,caz.."11-|r Trampa explosiva", 			3, 45733},
-		{1,caz.."12-|r Trampa congelante",			3, 42905},
-		{1,caz.."13-|r Trampa de escarcha", 		3, 42906},
-		{1,caz.."14-|r Marca del cazador", 			3, 42907},
-		{1,caz.."15-|r Trampa de inmolación", 		3, 42908},
-		{1,caz.."16-|r Del halcón", 				3, 42909},
-		{1,caz.."17-|r Disparo mortal", 			3, 45732},
-		{1,caz.."18-|r Multidisparo", 				3, 42910},
-		{1,caz.."19-|r Fuego rápido", 				3, 42911},
-		{1,caz.."20-|r Golpe de raptor", 			3, 45735},
-		{1,caz.."21-|r Disparo de dispersión", 		3, 45734},
-		{1,caz.."22-|r Picadura de serpiente", 		3, 42912},
-		{1,caz.."23-|r Trampa con culebras", 		3, 42913},
-		{1,caz.."24-|r Disparo firme",				3, 42914},
-		{1,caz.."25-|r Aura de disparo certero",	3, 42915},
-		{1,caz.."26-|r Salva", 						3, 42916},
-		{1,caz.."27-|r Picadura de dracoleón",		3, 42917},           
-		{1, "Glifos menores >",						300, 0},
-		{7, "< Menú principal",						0, 0}},
-	[300]={
-		{1,caz.."1-|r Fingir muerte",	300, 43351},
-		{1,caz.."2-|r Aliviar mascota",	300, 43350},
-		{1,caz.."3-|r Fuerza poseída", 	300, 43354},
-		{1,caz.."4-|r Revivir mascota", 300, 43338},  
-		{1,caz.."5-|r Asustar bestia", 	300, 43356},
-		{1,caz.."6-|r De la manada", 	300, 43355},
-		{1, "< Glifos sublimes",		3, 0}},
-	[4]={
-		{1,pic.."1-|r Subidón de adrenalina",	4, 42954},
-		{1,pic.."2-|r Emboscada", 				4, 42955},
-		{1,pic.."3-|r Puñalada", 				4, 42956},
-		{1,pic.."4-|r Aluvión de acero", 		4, 42957},
-		{1,pic.."5-|r Capa de las sombras", 	4, 45769},
-		{1,pic.."6-|r Veneno entorpecedor", 	4, 42958},
-		{1,pic.."7-|r Lanzamiento mortal", 		4, 42959},
-		{1,pic.."8-|r Evasión", 				4, 42960},
-		{1,pic.."9-|r Eviscerar", 				4, 42961},
-		{1,pic.."10-|r Exponer armadura", 		4, 42962},
-		{1,pic.."11-|r Abanico de cuchillos",	4, 45766},
-		{1,pic.."12-|r Amago",					4, 42963},
-		{1,pic.."13-|r Garrote", 				4, 42964},
-		{1,pic.."14-|r Golpe fantasmal", 		4, 42965},
-		{1,pic.."15-|r Gubia", 					4, 42966},
-		{1,pic.."16-|r Hemorragia", 			4, 42967},
-		{1,pic.."17-|r Hambre de sangre", 		4, 45761},
-		{1,pic.."18-|r Asesinato múltiple", 	4, 45762},
-		{1,pic.."19-|r Mutilar", 				4, 45768},
-		{1,pic.."20-|r Preparación", 			4, 42968},
-		{1,pic.."21-|r Ruptura", 				4, 42969},
-		{1,pic.."22-|r Porrazo", 				4, 42970},
-		{1,pic.."23-|r Danza de las sombras", 	4, 45764},
-		{1,pic.."24-|r Golpe siniestro",		4, 42972},           
-		{1,pic.."25-|r Hacer picadillo", 		4, 42973},
-		{1,pic.."26-|r Sprint", 				4, 42974},
-		{1,pic.."27-|r Secretos del oficio",	4, 45767},
-		{1,pic.."28-|r Vigor", 					4, 42971},           
-		{1, "Glifos menores >",					400, 0},
-		{7, "< Menú principal",					0, 0}},
-	[400]={
-		{1,pic.."1-|r Velocidad borrosa",	400, 43379},
-		{1,pic.."2-|r Distraer",			400, 43376},
-		{1,pic.."3-|r Forzar cerradura", 	400, 43377},
-		{1,pic.."4-|r Robar", 				400, 43343},  
-		{1,pic.."5-|r Caída segura", 		400, 43378},     
-		{1,pic.."6-|r Esfumarse", 			400, 43380},
-		{1, "< Glifos sublimes",			4, 0}},
-	[5]={
-		{1,sac.."1-|r Círculo de sanación",				5, 42396},
-		{1,sac.."2-|r Disipar magia", 					5, 42397},
-		{1,sac.."3-|r Dispersión", 						5, 45753},
-		{1,sac.."4-|r Desvanecerse", 					5, 42398},
-		{1,sac.."5-|r Resguardo de miedo", 				5, 42399},
-		{1,sac.."6-|r Sanación relámpago", 				5, 42400},
-		{1,sac.."7-|r Espíritu guardián", 				5, 45755},
-		{1,sac.."8-|r Nova sagrada", 					5, 42401},
-		{1,sac.."9-|r Himno de esperanza", 				5, 45758},
-		{1,sac.."10-|r Fuego interno", 					5, 42402},
-		{1,sac.."11-|r Pozo de luz", 					5, 42403},
-		{1,sac.."12-|r Disipación en masa", 			5, 42404},
-		{1,sac.."13-|r Control mental",					5, 42405},
-		{1,sac.."14-|r Palabra de las Sombras: dolor", 	5, 42406},
-		{1,sac.."15-|r Abrasamiento mental", 			5, 45757},
-		{1,sac.."16-|r Supresión de dolor", 			5, 45760},
-		{1,sac.."17-|r Penitencia", 					5, 45756},
-		{1,sac.."18-|r Palabda de Poder: Escudo", 		5, 42408},
-		{1,sac.."19-|r Rezo de sanación", 				5, 42409},
-		{1,sac.."20-|r Alarido psíquico", 				5, 42410},
-		{1,sac.."21-|r Renovar", 						5, 42411},
-		{1,sac.."22-|r Encarcelamiento de la plaga", 	5, 42412},
-		{1,sac.."23-|r De sombra", 						5, 42407},
-		{1,sac.."24-|r Palabra de las Sombras: Muerte", 5, 42414},
-		{1,sac.."25-|r Tortura mental",					5, 42415},
-		{1,sac.."26-|r Punición", 						5, 42416},
-		{1,sac.."27-|r Espíritu redentor", 				5, 42417},          
-		{1, "Glifos menores >",							500, 0},
-		{7, "< Menú principal",							0, 0}},
-	[500]={
-		{1,sac.."1-|r De lo desvaído",					500, 43342},
-		{1,sac.."2-|r De entereza",						500, 43371},
-		{1,sac.."3-|r Levitar", 						500, 43370},
-		{1,sac.."4-|r Encadenar no-muerto", 			500, 43373},  
-		{1,sac.."5-|r Protección contra las sombras", 	500, 43372},
-		{1,sac.."6-|r Maligno de las sombras", 			500, 43374},
-		{1, "< Glifos sublimes",						5, 0}},
-	[6]={
-		{1,cab.."1-|r Caparazón antimagia",			6, 43533},
-		{1,cab.."2-|r Golpe sangriento", 			6, 43826},
-		{1,cab.."3-|r Escudo óseo", 				6, 43536},
-		{1,cab.."4-|r Cadenas de hielo", 			6, 43537},
-		{1,cab.."5-|r Arma de runa danzante", 		6, 45799},
-		{1,cab.."6-|r Orden oscura", 				6, 43538},
-		{1,cab.."7-|r Muerte oscura", 				6, 45804},
-		{1,cab.."8-|r Muerte y descomposición", 	6, 43542},
-		{1,cab.."9-|r Atracción letal", 			6, 43541},
-		{1,cab.."10-|r Golpe letal", 				6, 43827},
-		{1,cab.."11-|r De enfermedad", 				6, 45805},
-		{1,cab.."12-|r Golpe de escarcha",			6, 43543},
-		{1,cab.."13-|r Golpe en el corazón", 		6, 43534},
-		{1,cab.."14-|r Explosión aullante", 		6, 45806},
-		{1,cab.."15-|r Frío hambriento", 			6, 45800},
-		{1,cab.."16-|r Entereza ligada al hielo", 	6, 43545},
-		{1,cab.."17-|r Toque helado", 				6, 43546},
-		{1,cab.."18-|r Asolar", 					6, 43547},
-		{1,cab.."19-|r Golpe de peste", 			6, 43548},
-		{1,cab.."20-|r Golpe con runa", 			6, 43550},
-		{1,cab.."21-|r Tranfusión de runa", 		6, 43825},
-		{1,cab.."22-|r Golpe de la plaga", 			6, 43551},
-		{1,cab.."23-|r Estrangular", 				6, 43552},
-		{1,cab.."24-|r Del necrófago",				6, 43549},
-		{1,cab.."25-|r Armadura inquebrantable", 	6, 43553},
-		{1,cab.."26-|r Añublo profano", 			6, 45803},
-		{1,cab.."27-|r Sangre vampírica",			6, 43554},          
-		{1, "Glifos menores >",600, 0},
-		{7, "< Menú principal",	0, 0}},
-	[600]={
-		{1,cab.."1-|r Tranfusión de sangre",	600, 43535},
-		{1,cab.."2-|r Deflagración de cadáver",	600, 43671},
-		{1,cab.."3-|r Abrazo de la muerte", 	600, 43539},
-		{1,cab.."4-|r Cuerno de invierno", 		600, 43544},  
-		{1,cab.."5-|r Pestilencia", 			600, 43672},
-		{1,cab.."6-|r Levantar a muerto", 		600, 43673},
-		{1, "< Glifos sublimes",6, 0}},
-	[7]={
-		{1,cha.."1-|r Sanación en cadena",			7, 41517},
-		{1,cha.."2-|r Cadena de relámpagos", 		7, 41518},
-		{1,cha.."3-|r Escudo de tierra", 			7, 45775},
-		{1,cha.."4-|r De choque", 					7, 41526},
-		{1,cha.."5-|r Arma de vida terrestre", 		7, 41527},
-		{1,cha.."6-|r Maestría elemental", 			7, 41552},
-		{1,cha.."7-|r Espíritu feral", 				7, 45771},
-		{1,cha.."8-|r Tótem elemental de fuego", 	7, 41529},
-		{1,cha.."9-|r Nova de fuego", 				7, 41530},
-		{1,cha.."10-|r Choque de llamas", 			7, 41531},
-		{1,cha.."11-|r Arma lengua de fuego", 		7, 41532},
-		{1,cha.."12-|r Choque de escarcha",			7, 41547},
-		{1,cha.."13-|r Tótem corriente de sanación",7, 41533},
-		{1,cha.."14-|r Ola de sanación", 			7, 41534},
-		{1,cha.."15-|r Maleficio", 					7, 45777},
-		{1,cha.."16-|r De lava", 					7, 41524},
-		{1,cha.."17-|r Latigazo de lava", 			7, 41540},
-		{1,cha.."18-|r Ola de sanación inferior", 	7, 41535},
-		{1,cha.."19-|r Descarga de relámpagos", 	7, 41536},
-		{1,cha.."20-|r Escudo de relámpagos", 		7, 41537},
-		{1,cha.."21-|r Tótem marea de maná", 		7, 41538},
-		{1,cha.."22-|r Mareas vivas", 				7, 45772},
-		{1,cha.."23-|r Tótem garra de piedra", 		7, 45778},
-		{1,cha.."24-|r Golpe de tormenta", 			7, 41539},
-		{1,cha.."25-|r De Trueno",					7, 45770},
-		{1,cha.."26-|r Tótem de cólera", 			7, 45776},
-		{1,cha.."27-|r Maestría en agua", 			7, 41541},
-		{1,cha.."28-|r Arma viento furioso",		7, 41542},          
-		{1, "Glifos menores >",700, 0},
-		{7, "< Menú principal",	0, 0}},
-	[700]={
-		{1,cha.."1-|r Regreso astral",			700, 43381},
-		{1,cha.."2-|r Lobo fantasmal",			700, 43725},
-		{1,cha.."3-|r Vida renovada", 			700, 43385},
-		{1,cha.."4-|r Tormenta de trienos", 	700, 44923},  
-		{1,cha.."5-|r Respiración acuática",	700, 43344},
-		{1,cha.."6-|r Escudo de agua", 			700, 43386},
-		{1,cha.."7-|r Caminar sobre el agua",	700, 43388},
-		{1, "< Glifos sublimes",				7, 0}},
-	[8]={
-		{1,mag.."1-|r Tromba arcana",			8, 45738},
-		{1,mag.."2-|r Explosión arcana", 		8, 44955},
-		{1,mag.."3-|r Deflagración arcana", 	8, 42734},
-		{1,mag.."4-|r Misiles arcanos", 		8, 42735},
-		{1,mag.."5-|r Poder arcano", 			8, 42736},
-		{1,mag.."6-|r Traslación", 				8, 42737},
-		{1,mag.."7-|r Congelación profunda", 	8, 45736},
-		{1,mag.."8-|r Agua eterna", 			8, 50045},
-		{1,mag.."9-|r Evocación", 				8, 42738},
-		{1,mag.."10-|r Explosión de fuego", 	8, 42740},
-		{1,mag.."11-|r Bola de fuego", 			8, 42739},
-		{1,mag.."12-|r Nova de escarcha",		8, 42741},
-		{1,mag.."13-|r Descarga de escarcha", 	8, 42742},
-		{1,mag.."14-|r De pirofrío", 			8, 44684},
-		{1,mag.."15-|r Armadura de hielo", 		8, 42743},
-		{1,mag.."16-|r Barrera de hielo", 		8, 45740},
-		{1,mag.."17-|r Bloque de hielo", 		8, 42744},
-		{1,mag.."18-|r Lanza de hielo", 		8, 42745},
-		{1,mag.."19-|r Venas heladas", 			8, 42746},
-		{1,mag.."20-|r Agostar", 				8, 42747},
-		{1,mag.."21-|r Invisibilidad", 			8, 42748},
-		{1,mag.."22-|r Bomba viva", 			8, 45737},
-		{1,mag.."23-|r Armadura de mago", 		8, 42749},
-		{1,mag.."24-|r Gema de maná",			8, 42750},
-		{1,mag.."25-|r Reflejo exacto", 		8, 45739},
-		{1,mag.."26-|r Armadura de arrabio", 	8, 42751},
-		{1,mag.."27-|r De Polimorfia",			8, 42752},
-		{1,mag.."28-|r Eliminar maldición", 	8, 42753},
-		{1,mag.."29-|r Elemental de agua", 		8, 42754},            
-		{1, "Glifos menores >",800, 0},
-		{7, "< Menú principal",	0, 0}},
-	[800]={
-		{1,mag.."1-|r Intelecto arcano",			800, 43339},
-		{1,mag.."2-|r Ola explosiva",				800, 44920},
-		{1,mag.."3-|r Resguardo contra el fuego", 	800, 43357},
-		{1,mag.."4-|r Armadura de escarcha", 		800, 43359},  
-		{1,mag.."5-|r Resguado conta la escarcha", 	800, 43360},
-		{1,mag.."6-|r Caída lenta", 				800, 43364},
-		{1,mag.."7-|r Del pingüino", 				800, 43361},
-		{1, "< Glifos sublimes",					8, 0}},
-	[9]={
-		{1,bru.."1-|r Descarga de caos",			9, 45781},
-		{1,bru.."2-|r Conflagrar", 					9, 42454},
-		{1,bru.."3-|r Corrupción", 					9, 42455},
-		{1,bru.."4-|r Maldición de agonía", 		9, 42456},
-		{1,bru.."5-|r Espiral de la muerte", 		9, 42457},
-		{1,bru.."6-|r Círculo demoníaco", 			9, 45782},
-		{1,bru.."7-|r Miedo", 						9, 42458},
-		{1,bru.."8-|r Guardia vil", 				9, 42459},
-		{1,bru.."9-|r Manáfago", 					9, 42460},
-		{1,bru.."10-|r Poseer", 					9, 45779},
-		{1,bru.."11-|r Cauce de salud", 			9, 42461},
-		{1,bru.."12-|r Piedra de salud",			9, 42462},
-		{1,bru.."13-|r Aullido de terror", 			9, 42463},
-		{1,bru.."14-|r Inmolar", 					9, 42464},
-		{1,bru.."15-|r Diablillo", 					9, 42465},
-		{1,bru.."16-|r Incinerar", 					9, 42453},
-		{1,bru.."17-|r Tranfusión de vida", 		9, 45785},
-		{1,bru.."18-|r Metamorfosis", 				9, 45780},
-		{1,bru.."19-|r Descomposición presurosa", 	9, 50077},
-		{1,bru.."20-|r Dolor abrasador", 			9, 42466},
-		{1,bru.."21-|r Descarga de las sombras", 	9, 42467},
-		{1,bru.."22-|r Quemadura de las sombras", 	9, 42468},
-		{1,bru.."23-|r Llama de las sombras", 		9, 45783},
-		{1,bru.."24-|r Succionar vida",				9, 42469},
-		{1,bru.."25-|r Enlace de alma", 			9, 45789},
-		{1,bru.."26-|r Piedra de alma", 			9, 42470},
-		{1,bru.."27-|r De seducción",				9, 42471},
-		{1,bru.."28-|r Aflicción inestable", 		9, 42472}, 
-		{1,bru.."28-|r Abisario", 					9, 42473},          
-		{1, "Glifos menores >",						900, 0},
-		{7, "< Menú principal",						0, 0}},
-	[900]={
-		{1,bru.."1-|r Maldición de agotamiento",900, 43392},
-		{1,bru.."2-|r Drenar alma",				900, 43390},
-		{1,bru.."3-|r Esclavizar demonio", 		900, 43393},
-		{1,bru.."4-|r Kilrogg", 				900, 43391},  
-		{1,bru.."5-|r De almas", 				900, 43394},
-		{1,bru.."6-|r Aliento inagotable", 		900, 43389},
-		{1, "< Glifos sublimes",				9, 0}},
-	[10]={
-		{1,dru.."1-|r Piel de corteza",				10, 45623},
-		{1,dru.."2-|r De rabia", 					10, 45601},
-		{1,dru.."3-|r De zarpa", 					10, 48720},
-		{1,dru.."4-|r Raíces enredadoras", 			10, 40924},
-		{1,dru.."5-|r Enfoque", 					10, 44928},
-		{1,dru.."6-|r Regeneración frenética", 		10, 40896},
-		{1,dru.."7-|r Bramido", 					10, 40899},
-		{1,dru.."8-|r Toque de sanación", 			10, 40914},
-		{1,dru.."9-|r Huracán", 					10, 40920},
-		{1,dru.."10-|r Estimular", 					10, 40908},
-		{1,dru.."11-|r Enjambre de insectos", 		10, 40919},
-		{1,dru.."12-|r Flor de vida",				10, 40915},
-		{1,dru.."13-|r Destrozar", 					10, 40900},
-		{1,dru.."14-|r Magullar", 					10, 40897},
-		{1,dru.."15-|r De monzón", 					10, 45622},
-		{1,dru.."16-|r Fuego lunar", 				10, 40923},
-		{1,dru.."17-|r Nutrir", 					10, 45603},
-		{1,dru.."18-|r Arañazo", 					10, 40903},
-		{1,dru.."19-|r Rejuvenecimiento rápido", 	10, 50125},
-		{1,dru.."20-|r Renacer", 					10, 40909},       
-		{1, "Siguiente >",101, 0},
-		{7, "< Menú principal",	0, 0}},
-	[101]={
-		{1,dru.."21-|r Recrecimiento", 				101, 40912},
-		{1,dru.."22-|r Rejuvenecimiento", 			101, 40913},
-		{1,dru.."23-|r Destripar", 					101, 40902},
-		{1,dru.."24-|r Rugido salvaje",				101, 45604},
-		{1,dru.."25-|r De flebotomía", 				101, 40901},
-		{1,dru.."26-|r Lluvia de estrellas", 		101, 40921},
-		{1,dru.."27-|r Fuego estelar",				101, 40916},
-		{1,dru.."28-|r Instintos de supervivencia", 101, 46372},
-		{1,dru.."29-|r Alivio presto", 				101, 40906},
-		{1,dru.."30-|r Cólera",						101, 40922},
-		{1,dru.."31-|r Crecimiento salvaje", 		101, 45602},
-		{1, "Glifos menores >",102, 0},
-		{7, "< Menú principal",	0, 0}},
-	[102]={
-		{1,dru.."1-|r Forma acuática", 		102, 43316},
-		{1,dru.."2-|r Rugido desafiante", 	102, 43334},
-		{1,dru.."3-|r Carrerilla",			102, 43674},
-		{1,dru.."4-|r De lo salvaje", 		102, 43335},
-		{1,dru.."5-|r De espinas", 			102, 43332},
-		{1,dru.."6-|r De tifón",			102, 44922},
-		{1,dru.."7-|r Renacer desahogado", 	102, 43331},
-		{1, "< Glifos sublimes",101, 0}}
-	}	
+local minor = {--> ID de los glifos menores de todas las clases.
+{43395,43396,43397,49084,43400,43398,43399},{43369,43365,43368,43366,43367,43340},{43351,43350,43354,43338,43356,43355},
+{43379,43376,43377,43343,43378,43380},{43342,43371,43370,43373,43372,43374},{43535,43671,43539,43544,43672,43673},{43381,43725,43385,44923,43344,43386,43388},
+{43339,44920,43357,43359,43360,43364,43361},{43392,43390,43393,43391,43394,43389},{43316,43334,43674,43335,43332,44922,43331}}
 
-local function Saludo(E,P,U)
-	P:GossipClearMenu()
-	for m=1, #menu[0] do local a,b,c,d = table.unpack(menu[0][m]) P:GossipMenuAddItem(a,b,c,d) end
-    P:GossipSendMenu(1,U)
+local soundID = {--> Sonidos de "Inventario lleno" por raza y género.
+[1]={1875,1999}, [2]={2284,2341}, [4]={1581,1654}, [8]={2118,2229}, [16]={2054,2173},
+[32]={2396,2397}, [64]={1708,1709}, [128]={1820,1930}, [512]={9549,9550}, [1024]={9465,9466}}
+
+local function OnGossipHello(e, P, U) ---------------------------------------
+    if SCRIPT_ON then
+        P:GossipClearMenu()
+        for icon = 1, 10 do
+            P:GossipMenuAddItem(0, i[icon][1]..i[icon][2], icon, 100)
+        end
+        P:GossipSendMenu(1, U)
+    end
+end -------------------------------------------------------------------------
+
+local function OnGossipClick(e, P, U, SEL, I)
+
+    if I==10 then -- Sublimes
+        P:GossipClearMenu()
+        P:GossipMenuAddItem(0, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:33:33:-23|tAtrás", SEL, 100)
+        for j, itemID in ipairs(major[SEL]) do
+            local sql = WorldDBQuery("SELECT `Name` FROM `item_template_locale` WHERE locale = 'esMX' AND `ID` = " .. itemID)
+            local removedGlyphOf = (sql and sql:GetString(0)) or "" --> Operador ternario. Si el query devuelve, se captura el nombre.
+            local outputString = removedGlyphOf:gsub("^Glifo de ", ""):gsub("^%l", string.upper) --> Eliminamos "Glifo de ", y hacemos mayúscula la primra letra.
+            local txt = string.format("|TInterface\\Icons\\%s:33:33:-23|t%d: %s", i[SEL + 10][1], j, outputString)
+            local str = string.format("|cffffffff%d: %s", j, GetItemLink(itemID, 7))
+            P:GossipMenuAddItem(0, txt, SEL, itemID)
+            P:SendBroadcastMessage(str)      
+        end
+        P:GossipSendMenu(1, U)
+    end
+
+    if I==11 then -- Menores  
+        P:GossipClearMenu()
+        P:GossipMenuAddItem(0, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:33:33:-23|tAtrás", SEL, 100)
+        for j, itemID in ipairs(minor[SEL]) do
+            local sql = WorldDBQuery("SELECT `Name` FROM `item_template_locale` WHERE locale = 'esMX' AND `ID` = " .. itemID)
+            local removedGlyphOf = (sql and sql:GetString(0)) or "" --> Operador ternario de nuevo.
+            local outputString = removedGlyphOf:gsub("^Glifo de ", ""):gsub("^%l", string.upper) --> Eliminamos "Glifo de ", y hacemos mayúscula la primra letra.
+            local txt = string.format("|TInterface\\Icons\\%s:33:33:-23|t%d: %s", i[SEL + 10][2], j, outputString)
+            local str = string.format("|cffffffff%d: %s", j, GetItemLink(itemID, 7))
+            P:GossipMenuAddItem(0, txt, SEL, itemID)
+            P:SendBroadcastMessage(str)      
+        end
+        P:GossipSendMenu(1, U) 
+    end
+
+    if I>1000 then
+        local majorGlyphFound, minorGlyphFound = false, false
+	--> Definimos esto para retornar true si el glifo seleccionado fue encontrado. ¿Esto para qué? Abajo te digo.
+        for glyph = 1, #major[SEL] do if I==major[SEL][glyph] then majorGlyphFound = true break end end
+        for glyph = 1, #minor[SEL] do if I==minor[SEL][glyph] then minorGlyphFound = true break end end
+
+	--> Para poder activar la posiblidad de clikear seguidamente y que no saque del menú en que se está.
+        if P:AddItem(I) then
+            if majorGlyphFound then OnGossipClick(e, P, U, SEL, 10) end
+            if minorGlyphFound then OnGossipClick(e, P, U, SEL, 11) end
+        else
+            if majorGlyphFound then OnGossipClick(e, P, U, SEL, 10) end
+            if minorGlyphFound then OnGossipClick(e, P, U, SEL, 11) end
+            P:SendAreaTriggerMessage("¡Tienes el inventario lleno!")
+            local gen = P:GetGender()==0 and 1 or 2 --> Otro operador ternario
+            P:PlayDistanceSound(soundID[P:GetRaceMask()][gen], P) --> Sonido
+        end
+    end
+
+    if I==100 then
+        P:GossipClearMenu()     
+        P:GossipMenuAddItem(0, "|TInterface\\Icons\\"..i[SEL+10][1]..":33:33:-23|tGlifos Sublimes", SEL, 10)
+        P:GossipMenuAddItem(0, "|TInterface\\Icons\\"..i[SEL+10][2]..":33:33:-23|tGlifos Menores", SEL, 11)
+        P:GossipMenuAddItem(0, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:33:33:-23|tAtrás", 0, 101)     
+        P:GossipSendMenu(1, U)
+    end
+
+    if I==101 then OnGossipHello(e, P, U) end
+
 end
 
-local function MenuClick(E,P,U,S,id) P:GossipClearMenu() 
-
-	if S==0 and id==0 then Saludo(E,P,U) end
-
-	if S>=1 then 
-		for i=1,#menu[S] do local a,b,c,d = table.unpack( menu[S][i] ) P:GossipMenuAddItem(a,b,c,d) end 
-		P:GossipSendMenu(1,U)
-	end
-
-	if S>=1 and id>40000 then
-		if Precio == 1 then
-			if P:GetCoinage() >= (oro*10000) then
-				P:ModifyMoney(-1*(oro*10000))
-				P:SendBroadcastMessage("Has pagado "..oro.." de oro.")
-			else
-				U:SendUnitSay('No tienes suficiente dinero.',0) P:GossipComplete() return
-			end
-		end
-		P:AddItem(id,1) if Precio ==1 then P:GossipComplete() end		
-	end
-end
-RegisterCreatureGossipEvent(NpcId, 1, Saludo)
-RegisterCreatureGossipEvent(NpcId, 2, MenuClick)
+RegisterCreatureGossipEvent(NPC, 1, OnGossipHello)
+RegisterCreatureGossipEvent(NPC, 2, OnGossipClick)
